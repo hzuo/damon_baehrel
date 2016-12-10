@@ -1,0 +1,10 @@
+Hi Damon, 
+
+My friend and I are excited about dining with you!
+
+We are local and available any day of the week on short notice. 
+
+Hoping there might be something available :)
+
+Best,
+<%= my_name %>

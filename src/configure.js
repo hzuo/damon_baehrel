@@ -39,15 +39,15 @@ function* main() {
   const googleClientSecret = yield question('google client secret: ');
   assert(!_.isEmpty(googleClientSecret));
 
-  const oauth2Client = bluebird.promisifyAll(new google.auth.OAuth2(googleClientId, googleClientSecret));
+  const oauth2Client = bluebird.promisifyAll(new google.auth.OAuth2(googleClientId, googleClientSecret, "http://127.0.0.1:1337"));
   const authUrl = oauth2Client.generateAuthUrl({
     access_type: 'offline',
-    scope: ['https://www.googleapis.com/auth/gmail.compose']
+    scope: ['profile', 'email', 'https://www.googleapis.com/auth/gmail.compose']
   });
   console.log(`authorize this app by visiting this url: ${authUrl}`);
   const code = yield question('enter the code from that page here: ');
-  const refreshToken = yield oauth2Client.getTokenAsync(code);
-  assert(!_.isEmpty(refreshToken));
+  const credentials = yield oauth2Client.getTokenAsync(code);
+  assert(_.isObject(credentials));
 
   const sendInterval0 = yield question('send interval (ms): ');
   const sendInterval = parseInt(sendInterval0);
@@ -60,17 +60,22 @@ function* main() {
   const targetEmailAddress = yield question('target email address: ');
   assert(emailRegex.test(targetEmailAddress));
 
+  const subject = yield question('subject: ');
+  assert(!_.isEmpty(subject));
+
   const templateFile = yield question('template file: ');
   assert(!_.isEmpty(templateFile));
   const template = yield readFile(templateFile, 'utf8');
+  assert(!_.isEmpty(template));
 
   yield redis.mset({
     'config.google_client_id': googleClientId,
     'config.google_client_secret': googleClientSecret,
-    'config.refresh_token': refreshToken,
+    'config.credentials': JSON.stringify(credentials),
     'config.send_interval': sendInterval,
     'config.check_interval': checkInterval,
     'config.target_email_address': targetEmailAddress,
+    'config.subject': subject,
     'config.template': template,
   });
 
@@ -82,6 +87,9 @@ function* main() {
 (() => {
   const mainFunction = bluebird.coroutine(main);
   mainFunction().then((status) => {
-    console.log(`main exited with status: ${status}`);
+    redis.quit();
+    if (_.isSafeInteger(status)) {
+      process.exit(status);
+    }
   });
 })();
