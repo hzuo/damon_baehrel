@@ -2,7 +2,7 @@
   "name": "damon_baehrel",
   "version": "0.0.0",
   "scripts": {
-    "setup": "node src/setup.js",
+    "configure": "node src/configure.js",
     "start": "node src/main.js"
   },
   "dependencies": {

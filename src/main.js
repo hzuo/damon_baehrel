@@ -27,12 +27,17 @@ function* getConfig() {
   const checkInterval0 = yield redis.get('config.check_interval');
   const checkInterval = parseInt(checkInterval0);
   assert(_.isSafeInteger(checkInterval));
+  const targetEmailAddress = yield redis.get('config.target_email_address');
+  assert(!_.isEmpty(targetEmailAddress));
+  const template = yield redis.get('config.template');
   return {
     googleClientId,
     googleClientSecret,
     refreshToken,
     sendInterval,
     checkInterval,
+    targetEmailAddress,
+    template
   };
 }
 
@@ -84,6 +89,8 @@ function* main() {
     refreshToken,
     sendInterval,
     checkInterval,
+    targetEmailAddress,
+    template
   } = yield* getConfig();
   const gmail = makeGmail(googleClientId, googleClientSecret, refreshToken);
   while (true) {
