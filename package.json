@@ -2,13 +2,15 @@
   "name": "damon_baehrel",
   "version": "0.0.0",
   "scripts": {
+    "setup": "node src/setup.js",
     "start": "node src/main.js"
   },
   "dependencies": {
     "bluebird": "^3.4.6",
     "googleapis": "^15.0.0",
     "ioredis": "^2.4.2",
-    "lodash": "^4.17.2"
+    "lodash": "^4.17.2",
+    "moment": "^2.17.1"
   },
   "engines": {
     "node": ">= 6"
