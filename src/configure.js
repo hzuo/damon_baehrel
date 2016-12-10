@@ -39,7 +39,9 @@ function* main() {
   const googleClientSecret = yield question('google client secret: ');
   assert(!_.isEmpty(googleClientSecret));
 
-  const oauth2Client = bluebird.promisifyAll(new google.auth.OAuth2(googleClientId, googleClientSecret, "http://127.0.0.1:1337"));
+  const oauth2Client = bluebird.promisifyAll(
+    new google.auth.OAuth2(googleClientId, googleClientSecret, 'urn:ietf:wg:oauth:2.0:oob')
+  );
   const authUrl = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: ['profile', 'email', 'https://www.googleapis.com/auth/gmail.compose']
